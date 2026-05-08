@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: action-ou-verite
+    env: python
+    buildCommand: ""
+    startCommand: python server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+    healthCheckPath: /api/health
+    autoDeploy: true

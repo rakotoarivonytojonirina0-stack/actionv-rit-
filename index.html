@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Action ou Vérité 🎲 - Version Améliorée</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f0c29;
+    --card: #1e1a45;
+    --card2: #16133a;
+    --action: #ff6b35;
+    --action2: #ff8c5a;
+    --verite: #00c9ff;
+    --verite2: #48deff;
+    --accent: #f7c948;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --text: #f0eeff;
+    --muted: #9b95c9;
+    --border: #2d2760;
+    --shadow: 0 8px 32px rgba(0,0,0,0.5);
+    --private: #ffd700;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(100,60,200,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,150,255,0.1) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 28px 16px 12px;
+  }
+  header h1 {
+    font-family: 'Lilita One', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    background: linear-gradient(135deg, var(--action), var(--accent), var(--verite));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+  }
+  header .subtitle {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 4px;
+  }
+  header .version {
+    margin-top: 12px;
+    font-size: .8rem;
+    color: var(--private);
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-block;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 14px 40px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card.private {
+    border-color: rgba(255,215,0,0.3);
+    position: relative;
+  }
+  .card.private::before {
+    content: '🔒 Privé';
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--private);
+    color: #000;
+    font-size: .7rem;
+    font-weight: 800;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .card h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    background: var(--card2);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .2s;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+  textarea { min-height: 70px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: .95rem;
+    padding: 11px 22px;
+    transition: transform .15s, opacity .15s, box-shadow .2s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); opacity: .93; }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
+  .btn-action  { background: linear-gradient(135deg, var(--action), #d94f0f); color: #fff; }
+  .btn-verite  { background: linear-gradient(135deg, var(--verite), #0088bb); color: #fff; }
+  .btn-green   { background: linear-gradient(135deg, var(--green), #27ae60); color: #fff; }
+  .btn-red     { background: linear-gradient(135deg, var(--red), #c0392b); color: #fff; }
+  .btn-muted   { background: var(--border); color: var(--muted); }
+  .btn-full    { width: 100%; }
+  .btn-sm      { padding: 7px 14px; font-size: .82rem; border-radius: 9px; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .player-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .player-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card2);
+    border-radius: 11px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    transition: border-color .2s;
+  }
+  .player-item.current-turn { border-color: var(--accent); }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .player-name { font-weight: 700; flex: 1; }
+  .player-score {
+    font-size: .82rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .you-badge {
+    font-size: .7rem;
+    background: rgba(247,201,72,.15);
+    color: var(--accent);
+    border: 1px solid rgba(247,201,72,.3);
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-weight: 700;
+  }
+  .crown { font-size: 1rem; }
+
+  .phase-banner {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+  .phase-banner.action { background: rgba(255,107,53,.15); border: 1px solid rgba(255,107,53,.3); color: var(--action2); }
+  .phase-banner.verite { background: rgba(0,201,255,.12); border: 1px solid rgba(0,201,255,.25); color: var(--verite2); }
+  .phase-banner.lobby  { background: rgba(124,58,237,.12); border: 1px solid rgba(124,58,237,.25); color: #a78bfa; }
+
+  .choice-big {
+    display: flex; gap: 12px; margin-top: 6px;
+  }
+  .choice-big .btn {
+    flex: 1;
+    padding: 22px 10px;
+    font-size: 1.3rem;
+    border-radius: 16px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .choice-big .btn small { font-size: .75rem; opacity: .75; font-weight: 600; }
+
+  .proposals-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .proposal-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .proposal-card:hover { border-color: var(--accent); background: rgba(247,201,72,.06); }
+  .proposal-card .prop-text { flex: 1; font-weight: 600; line-height: 1.5; }
+  .proposal-card .prop-author { font-size: .75rem; color: var(--muted); margin-top: 3px; }
+  .proposal-card .select-btn { flex-shrink: 0; }
+
+  .challenge-box {
+    background: linear-gradient(135deg, rgba(255,107,53,.08), rgba(0,201,255,.06));
+    border: 2px solid rgba(255,107,53,.3);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+  .challenge-box.verite-box { border-color: rgba(0,201,255,.3); }
+  .challenge-type {
+    font-size: .85rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: .7;
+    margin-bottom: 8px;
+  }
+  .challenge-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .challenge-from { font-size: .8rem; color: var(--muted); }
+
+  .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+  .history-item {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    border-left: 3px solid var(--border);
+    font-size: .88rem;
+  }
+  .history-item.success { border-left-color: var(--green); }
+  .history-item.fail    { border-left-color: var(--red); }
+  .history-item.truth   { border-left-color: var(--verite); }
+  .history-item strong  { color: var(--accent); }
+  .history-item .private-badge {
+    font-size: .7rem;
+    background: rgba(255,215,0,0.15);
+    color: var(--private);
+    border-radius: 10px;
+    padding: 1px 6px;
+    margin-left: 6px;
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #2ecc71;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: .95rem;
+    z-index: 999;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    max-width: 90vw;
+    text-align: center;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.error { background: #e74c3c; }
+
+  .url-box {
+    background: var(--card2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .85rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    word-break: break-all;
+  }
+  .url-box span { flex: 1; }
+  .url-box button {
+    flex-shrink: 0;
+    background: var(--border);
+    border: none;
+    color: var(--text);
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+
+  .private-notice {
+    font-size: .8rem;
+    color: var(--private);
+    text-align: center;
+    padding: 8px;
+    background: rgba(255,215,0,0.05);
+    border-radius: 8px;
+    margin-top: 12px;
+    border: 1px solid rgba(255,215,0,0.1);
+  }
+
+  @media (max-width: 420px) {
+    .choice-big { flex-direction: column; }
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #page-join, #page-game { display: none; }
+  #page-join.active, #page-game.active { display: block; }
+
+  .waiting-msg {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎲 Action ou Vérité</h1>
+  <h1>créer par TOJO NIRINA</h1>
+  <p class="subtitle">Le jeu de la vérité… ou du défi !</p>
+  <div class="version">🔒 Version Améliorée - Propositions Privées</div>
+</header>
+
+<div class="wrap">
+  <div id="toast"></div>
+
+  <!-- ═══════════════ PAGE JOIN ═══════════════ -->
+  <div id="page-join" class="active">
+
+    <div class="card">
+      <h2>📋 Rejoindre la partie</h2>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <input type="text" id="inp-name" placeholder="Ton prénom (ex: Kévin)" maxlength="20" />
+        <button class="btn btn-primary" onclick="joinGame()">Rejoindre</button>
+      </div>
+      <div id="url-share" class="url-box" style="display:none">
+        🌐 <span id="share-url"></span>
+        <button onclick="copyUrl()">Copier</button>
+      </div>
+    </div>
+
+    <div class="card" id="lobby-players" style="display:none">
+      <h2>👥 Joueurs connectés</h2>
+      <ul class="player-list" id="lobby-list"></ul>
+      <div style="margin-top:16px">
+        <button class="btn btn-green btn-full" id="btn-start" onclick="startGame()" disabled>
+          ▶ Lancer la partie
+        </button>
+        <p style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px">
+          (Il faut au moins 2 joueurs)
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ PAGE GAME ═══════════════ -->
+  <div id="page-game">
+
+    <div id="phase-banner" class="phase-banner lobby"></div>
+
+    <div class="card">
+      <h2>👥 Joueurs</h2>
+      <ul class="player-list" id="game-player-list"></ul>
+    </div>
+
+    <!-- CHOISIR -->
+    <div id="sec-choosing" class="card" style="display:none">
+      <h2>🎯 C'est ton tour !</h2>
+      <p style="margin-bottom:12px;color:var(--muted)">Que choisis-tu ?</p>
+      <div class="choice-big">
+        <button class="btn btn-action" onclick="choose('action')">
+          💪 ACTION
+          <small>Fais quelque chose</small>
+        </button>
+        <button class="btn btn-verite" onclick="choose('verite')">
+          💬 VÉRITÉ
+          <small>Réponds honnêtement</small>
+        </button>
+      </div>
+    </div>
+
+    <!-- Attente du choix -->
+    <div id="sec-waiting-choice" class="card" style="display:none">
+      <div class="waiting-msg">
+        <span class="spinner"></span>
+        <span id="waiting-who"> attend le choix…</span>
+      </div>
+    </div>
+
+    <!-- PROPOSITIONS (visible par tous mais choix privé) -->
+    <div id="sec-proposals" class="card" style="display:none">
+      <h2 id="proposals-title">💡 Proposer une action</h2>
+      <p style="margin-bottom:10px;color:var(--muted);font-size:.9rem">
+        Proposez ce que <strong id="proposals-player">???</strong> devra faire !
+      </p>
+      <textarea id="inp-proposal" placeholder="Écris ta proposition ici…" maxlength="200"></textarea>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn btn-primary" onclick="sendProposal()" style="flex:1">
+          Envoyer ma proposition
+        </button>
+      </div>
+      <div id="proposal-sent-notice" class="private-notice" style="display:none">
+        ✅ Ta proposition a été envoyée. Seul <strong id="notice-player">???</strong> pourra la voir !
+      </div>
+    </div>
+
+    <!-- LISTE DES PROPOSITIONS (visible uniquement par le joueur concerné) -->
+    <div id="sec-proposal-list" class="card private" style="display:none">
+      <h2>📜 Propositions reçues 🔒</h2>
+      <p style="font-size:.8rem;color:var(--private);margin-bottom:10px">
+        Ces propositions sont visibles uniquement par toi. Personne d'autre ne peut les voir.
+      </p>
+      <div class="proposals-list" id="proposals-container"></div>
+      <div id="sec-choose-proposal" style="display:none;margin-top:10px">
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:8px">
+          Clique sur une proposition pour la choisir 👆
+        </p>
+      </div>
+    </div>
+
+    <!-- VÉRIFICATION -->
+    <div id="sec-challenge" class="card" style="display:none">
+      <h2 id="challenge-title">⚡ Défi en cours</h2>
+      <div id="challenge-box" class="challenge-box">
+        <div class="challenge-type" id="challenge-type">ACTION</div>
+        <div class="challenge-text" id="challenge-text">…</div>
+        <div class="challenge-from" id="challenge-from">proposé par …</div>
+      </div>
+
+      <!-- Pour l'ACTION: seul le proposeur valide -->
+      <div id="sec-action-validation" style="display:none;margin-top:16px">
+        <p style="text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:12px">
+          En tant que <strong id="action-proposer">proposeur</strong>, valide si l'action a été accomplie :
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-green btn-full" onclick="validateAction(true)">✅ Accompli !</button>
+          <button class="btn btn-red btn-full" onclick="validateAction(false)">❌ Non accompli !</button>
+        </div>
+      </div>
+
+      <!-- Pour la VÉRITÉ: le joueur répond, seul le proposeur voit -->
+      <div id="sec-truth-answer" style="display:none;margin-top:16px">
+        <p style="text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:12px">
+          Réponds à la question. <strong>Seul <span id="truth-proposer-name">???</span> verra ta réponse.</strong>
+        </p>
+        <textarea id="inp-answer" placeholder="Écris ta réponse ici…" maxlength="500"></textarea>
+        <button class="btn btn-verite btn-full" style="margin-top:10px" onclick="submitAnswer()">
+          🔒 Envoyer ma réponse (privée)
+        </button>
+      </div>
+
+      <!-- Pour le proposeur de vérité: voir la réponse -->
+      <div id="sec-truth-view" class="card private" style="display:none;margin-top:16px">
+        <h2>🔒 Réponse reçue</h2>
+        <p style="font-size:.8rem;color:var(--private);margin-bottom:10px">
+          Cette réponse est visible uniquement par toi (le proposeur).
+        </p>
+        <div id="truth-answer-display" style="background:var(--card2);padding:14px;border-radius:10px;font-style:italic;">
+          ...
+        </div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:8px;text-align:center">
+          Le jeu continue automatiquement...
+        </p>
+      </div>
+
+      <div id="sec-verify-wait" class="waiting-msg" style="display:none">
+        <span class="spinner"></span> En attente de validation…
+      </div>
+    </div>
+
+    <!-- HISTORIQUE PERSONNEL -->
+    <div class="card private">
+      <h2>📖 Mon Historique Personnel 🔒</h2>
+      <p style="font-size:.8rem;color:var(--private);margin-bottom:10px">
+        Cet historique est visible uniquement par toi. Il contient tes questions et réponses.
+      </p>
+      <div id="history-container">
+        <div class="waiting-msg">Aucun tour terminé pour l'instant.</div>
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <div style="text-align:center;margin-top:10px;margin-bottom:20px">
+      <button class="btn btn-muted btn-sm" onclick="resetGame()">🔄 Recommencer une nouvelle partie</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const API = '';
+let myName = localStorage.getItem('aov_name_v2') || '';
+let lastUpdate = 0;
+let polling = false;
+let state = null;
+let personalHistory = [];
+
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = '', 2800);
+}
+
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API + path, opts);
+    return await r.json();
+  } catch(e) {
+    return { ok: false, error: 'Erreur réseau' };
+  }
+}
+
+function avatarColor(name) {
+  const colors = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#ff5722','#00bcd4'];
+  let h = 0;
+  for (let c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return colors[h % colors.length];
+}
+
+function avatarEl(name) {
+  const col = avatarColor(name);
+  return `<div class="avatar" style="background:${col}">${name[0]}</div>`;
+}
+
+async function fetchAndShowUrl() {
+  const res = await api('GET', '/api/ip');
+  if (res.ok) {
+    const url = `http://${res.ip}:${res.port}`;
+    document.getElementById('share-url').textContent = url;
+    document.getElementById('url-share').style.display = 'flex';
+    window._shareUrl = url;
+  }
+}
+
+function copyUrl() {
+  if (window._shareUrl) {
+    navigator.clipboard.writeText(window._shareUrl).then(() => toast('URL copiée !'));
+  }
+}
+
+async function joinGame() {
+  const name = document.getElementById('inp-name').value.trim();
+  if (!name) { toast('Entre ton prénom !', true); return; }
+  const res = await api('POST', '/api/join', { name });
+  if (!res.ok) { toast(res.error, true); return; }
+  myName = name;
+  localStorage.setItem('aov_name_v2', name);
+  toast(`Bienvenue ${name} ! 🎉`);
+  startPolling();
+}
+
+async function startGame() {
+  const res = await api('POST', '/api/start', {});
+  if (!res.ok) toast(res.error, true);
+}
+
+async function choose(choice) {
+  const res = await api('POST', '/api/choose', { name: myName, choice });
+  if (!res.ok) toast(res.error, true);
+}
+
+async function sendProposal() {
+  const text = document.getElementById('inp-proposal').value.trim();
+  if (!text) { toast('Écris une proposition !', true); return; }
+  const res = await api('POST', '/api/propose', { name: myName, text });
+  if (!res.ok) { toast(res.error, true); return; }
+  toast('Proposition envoyée ! ✅');
+  document.getElementById('inp-proposal').value = '';
+  document.getElementById('proposal-sent-notice').style.display = '';
+  document.getElementById('notice-player').textContent = state.current_turn;
+}
+
+async function selectProposal(idx) {
+  const res = await api('POST', '/api/select_proposal', { name: myName, index: idx });
+  if (!res.ok) toast(res.error, true);
+}
+
+async function validateAction(completed) {
+  const res = await api('POST', '/api/verify', { 
+    name: myName, 
+    completed: completed,
+    answer: ''
+  });
+  if (!res.ok) { toast(res.error, true); return; }
+  toast(completed ? '✅ Action accomplie !' : '❌ Action non accomplie');
+}
+
+async function submitAnswer() {
+  const answer = document.getElementById('inp-answer').value.trim();
+  if (!answer) { toast('Écris ta réponse !', true); return; }
+  const res = await api('POST', '/api/verify', { 
+    name: myName, 
+    completed: null,
+    answer: answer
+  });
+  if (!res.ok) { toast(res.error, true); return; }
+  toast('Réponse envoyée en privé ! 🔒');
+  document.getElementById('inp-answer').value = '';
+}
+
+async function resetGame() {
+  if (!confirm('Recommencer une nouvelle partie ?')) return;
+  await api('POST', '/api/reset', {});
+  myName = '';
+  personalHistory = [];
+  localStorage.removeItem('aov_name_v2');
+  location.reload();
+}
+
+function startPolling() {
+  if (polling) return;
+  polling = true;
+  poll();
+}
+
+async function poll() {
+  while (polling) {
+    try {
+      const res = await fetch(API + `/api/poll?since=${lastUpdate}`);
+      const data = await res.json();
+      if (data.ok) {
+        lastUpdate = data.last_update;
+        state = data.state;
+        
+        // Mettre à jour l'historique personnel
+        if (state.personal_histories && state.personal_histories[myName]) {
+          personalHistory = state.personal_histories[myName];
+        }
+        
+        renderUI(state);
+      }
+    } catch(e) {}
+    await new Promise(r => setTimeout(r, 300));
+  }
+}
+
+function renderUI(s) {
+  const inGame = !!myName && (s.phase !== 'lobby' || myName in s.players);
+
+  if (!myName || !(myName in s.players)) {
+    document.getElementById('page-join').className = 'active';
+    document.getElementById('page-game').className = '';
+    renderLobby(s);
+    fetchAndShowUrl();
+    return;
+  }
+
+  if (s.phase === 'lobby') {
+    document.getElementById('page-join').className = 'active';
+    document.getElementById('page-game').className = '';
+    renderLobby(s);
+    fetchAndShowUrl();
+    return;
+  }
+
+  document.getElementById('page-join').className = '';
+  document.getElementById('page-game').className = 'active';
+  renderGamePage(s);
+}
+
+function renderLobby(s) {
+  const list = document.getElementById('lobby-list');
+  const players = Object.values(s.players);
+  const lobbyCard = document.getElementById('lobby-players');
+
+  if (players.length > 0) {
+    lobbyCard.style.display = '';
+    list.innerHTML = players.map(p =>
+      `<li class="player-item">
+        ${avatarEl(p.name)}
+        <span class="player-name">${p.name}</span>
+        ${p.name === myName ? '<span class="you-badge">Toi</span>' : ''}
+      </li>`
+    ).join('');
+    document.getElementById('btn-start').disabled = players.length < 2;
+  } else {
+    lobbyCard.style.display = 'none';
+  }
+}
+
+function renderGamePage(s) {
+  const isMyTurn = s.current_turn === myName;
+  const isAction = s.choice === 'action';
+  const activeProp = s.active_proposal;
+  const isProposer = activeProp && activeProp.author === myName;
+  const isVerifier = s.phase === 'verifying' && isProposer && isAction;
+  const isAnswerer = s.phase === 'verifying' && isMyTurn && !isAction;
+
+  // Phase banner
+  const banner = document.getElementById('phase-banner');
+  let bannerText = '', bannerClass = 'lobby';
+  if (s.phase === 'choosing') {
+    bannerText = isMyTurn ? `🎯 C'est TON TOUR de choisir !` : `🎯 C'est le tour de ${s.current_turn}`;
+    bannerClass = 'lobby';
+  } else if (s.phase === 'waiting_proposals') {
+    bannerText = s.choice === 'action'
+      ? `💪 ${s.current_turn} a choisi ACTION — Proposez un défi !`
+      : `💬 ${s.current_turn} a choisi VÉRITÉ — Posez une question !`;
+    bannerClass = s.choice === 'action' ? 'action' : 'verite';
+  } else if (s.phase === 'verifying') {
+    bannerText = s.choice === 'action'
+      ? `⚡ ${s.current_turn} doit accomplir l'ACTION !`
+      : `🔍 ${s.current_turn} répond à la VÉRITÉ !`;
+    bannerClass = s.choice === 'action' ? 'action' : 'verite';
+  }
+  banner.textContent = bannerText;
+  banner.className = `phase-banner ${bannerClass}`;
+
+  // Player list
+  const players = Object.values(s.players);
+  const gameList = document.getElementById('game-player-list');
+  gameList.innerHTML = players.sort((a,b) => b.score - a.score).map(p => {
+    const isCurrent = p.name === s.current_turn;
+    return `<li class="player-item ${isCurrent ? 'current-turn' : ''}">
+      ${isCurrent ? '<span class="crown">👑</span>' : avatarEl(p.name)}
+      <span class="player-name">${p.name} ${p.name === myName ? '<span class="you-badge">Toi</span>' : ''}</span>
+      <span class="player-score">⭐ ${p.score}</span>
+    </li>`;
+  }).join('');
+
+  // Hide all sections
+  ['sec-choosing','sec-waiting-choice','sec-proposals','sec-proposal-list',
+   'sec-challenge','sec-action-validation','sec-truth-answer','sec-truth-view']
+    .forEach(id => document.getElementById(id).style.display = 'none');
+
+  // Reset private notices
+  document.getElementById('proposal-sent-notice').style.display = 'none';
+
+  // CHOOSING phase
+  if (s.phase === 'choosing') {
+    if (isMyTurn) {
+      document.getElementById('sec-choosing').style.display = '';
+    } else {
+      document.getElementById('sec-waiting-choice').style.display = '';
+      document.getElementById('waiting-who').textContent = ` ${s.current_turn} choisit…`;
+    }
+  }
+
+  // WAITING PROPOSALS phase
+  if (s.phase === 'waiting_proposals') {
+    const label = s.choice === 'action' ? 'ACTION' : 'VÉRITÉ';
+    document.getElementById('proposals-title').textContent = `💡 Proposer une ${label}`;
+    document.getElementById('proposals-player').textContent = s.current_turn;
+
+    // Tout le monde peut proposer sauf le joueur concerné
+    if (!isMyTurn) {
+      document.getElementById('sec-proposals').style.display = '';
+    }
+
+    // MAIS seul le joueur concerné voit les propositions
+    if (isMyTurn) {
+      document.getElementById('sec-proposal-list').style.display = '';
+      renderProposals(s, true);
+    }
+  }
+
+  // VERIFYING phase
+  if (s.phase === 'verifying') {
+    document.getElementById('sec-challenge').style.display = '';
+    
+    const box = document.getElementById('challenge-box');
+    box.className = `challenge-box ${isAction ? '' : 'verite-box'}`;
+    document.getElementById('challenge-type').textContent = isAction ? '💪 ACTION' : '💬 VÉRITÉ';
+    document.getElementById('challenge-text').textContent = activeProp ? activeProp.text : '?';
+    document.getElementById('challenge-from').textContent = activeProp ? `proposé par ${activeProp.author}` : '';
+
+    if (isAction) {
+      // Pour l'action: seul le proposeur valide
+      if (isVerifier) {
+        document.getElementById('sec-action-validation').style.display = '';
+        document.getElementById('action-proposer').textContent = myName;
+      } else {
+        document.getElementById('sec-verify-wait').style.display = '';
+      }
+    } else {
+      // Pour la vérité: le joueur répond, seul le proposeur voit
+      if (isAnswerer) {
+        document.getElementById('sec-truth-answer').style.display = '';
+        document.getElementById('truth-proposer-name').textContent = activeProp.author;
+      } else if (isProposer) {
+        // Le proposeur peut voir qu'il attend la réponse
+        document.getElementById('sec-verify-wait').style.display = '';
+        document.getElementById('sec-verify-wait').innerHTML = 
+          '<span class="spinner"></span> En attente de la réponse de ' + s.current_turn + '…';
+      } else {
+        document.getElementById('sec-verify-wait').style.display = '';
+      }
+    }
+  }
+
+  // Historique personnel
+  renderPersonalHistory();
+}
+
+function renderProposals(s, canSelect) {
+  const container = document.getElementById('proposals-container');
+  const chooseSection = document.getElementById('sec-choose-proposal');
+  chooseSection.style.display = canSelect ? '' : 'none';
+
+  container.innerHTML = s.proposals.map((p, i) => `
+    <div class="proposal-card" onclick="${canSelect ? `selectProposal(${i})` : ''}">
+      <div style="flex:1">
+        <div class="prop-text">${escHtml(p.text)}</div>
+        <div class="prop-author">par ${escHtml(p.author)}</div>
+      </div>
+      ${canSelect ? `<button class="btn btn-primary btn-sm select-btn">Choisir !</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderPersonalHistory() {
+  const container = document.getElementById('history-container');
+  if (!personalHistory || personalHistory.length === 0) {
+    container.innerHTML = '<div class="waiting-msg">Aucun tour terminé pour l\'instant.</div>';
+    return;
+  }
+  
+  const items = [...personalHistory].reverse().map(h => {
+    const label = h.choice === 'action' ? '💪 Action' : '💬 Vérité';
+    let cls = 'success';
+    if (h.choice === 'action') {
+      cls = h.result === 'accompli' ? 'success' : 'fail';
+    } else {
+      cls = 'truth';
+    }
+    const emoji = h.result === 'accompli' ? '✅' : (h.result === 'echoue' ? '❌' : '💬');
+    
+    let answerHtml = '';
+    if (h.choice === 'verite' && h.answer && h.answer !== '***') {
+      answerHtml = `<br><span style="font-size:.78rem;color:var(--verite2)">💬 Réponse: "${escHtml(h.answer)}"</span>`;
+    }
+    
+    return `<div class="history-item ${cls}">
+      <strong>${h.player === myName ? 'Moi' : h.player}</strong> — ${label}
+      <span class="private-badge">🔒 Privé</span><br>
+      <em>"${escHtml(h.proposal)}"</em>${answerHtml}<br>
+      <span style="font-size:.78rem;color:var(--muted)">
+        proposé par ${h.proposed_by === myName ? 'moi' : h.proposed_by} • ${emoji} ${h.result}
+      </span>
+    </div>`;
+  }).join('');
+  
+  container.innerHTML = `<div class="history-list">${items}</div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init
+window.onload = async () => {
+  fetchAndShowUrl();
+  if (myName) {
+    const res = await api('POST', '/api/join', { name: myName });
+  }
+  startPolling();
+};
+</script>
+</body>
+</html>
